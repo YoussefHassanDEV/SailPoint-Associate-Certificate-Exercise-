@@ -1728,7 +1728,7 @@
                         </div>
                         <div class="resume-banner-actions">
                             <button class="resume-btn-primary" onclick="resumeProgress(event)">▶ Resume</button>
-                            <button class="resume-btn-dismiss" onclick="dismissProgress(event)">✕ Clear</button>
+                            <button class="resume-btn-dismiss" onclick="dismissProgress(event)">✕ Discard</button>
                         </div>
                     </div>
                 </div>
@@ -1746,6 +1746,9 @@
                 </div>
 
                 <div class="topics-grid" id="topicsGrid"></div>
+                <div style="text-align:center;padding:18px 0 4px;opacity:0.45;font-size:0.78em;">
+                    <button onclick="clearProgress();hideBanner();alert('Saved data cleared.');" style="background:none;border:none;color:white;cursor:pointer;text-decoration:underline;font-size:0.9em;opacity:0.7;">Clear saved progress</button>
+                </div>
             </div>
 
             <!-- ALL TOPICS RESULTS VIEW -->
@@ -1795,6 +1798,7 @@
                         <div class="card-face card-back">
                             <div class="card-label">ANSWER</div>
                             <div id="answerText"></div>
+                            <div id="explanationText" style="margin-top:14px;padding:12px 14px;background:rgba(102,126,234,0.1);border-left:3px solid var(--primary);border-radius:8px;font-size:0.85em;line-height:1.6;color:var(--gray-dark);display:none;"></div>
                             <div class="flip-hint">Click to go back</div>
                         </div>
                     </div>
@@ -2230,9 +2234,8 @@
             document.getElementById('examModeToggle').checked = true;
             syncExamToggleFixed(true);
 
-            document.getElementById('studyTopicTitle').textContent = '🏆 Full Exam — All Topics';
-            document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions across all 17 topics`;
             document.getElementById('searchInput').value = '';
+            updateStudyHeader();
 
             showStudyView();
             renderCard();
@@ -2447,6 +2450,7 @@
         function toggleExamMode() {
             isExamMode = document.getElementById('examModeToggle').checked;
             syncExamToggleFixed(isExamMode);
+            updateStudyHeader();
             examScores = {};
             examAnswered = [];
             examSelectedIndex = {};
@@ -2488,13 +2492,16 @@
             try {
                 // Store filteredQuestions as indices into allQuestions
                 const qIndices = filteredQuestions.map(q => allQuestions.indexOf(q));
+                // Convert sparse examAnswered array to object for safe JSON serialization
+                const examAnsweredObj = {};
+                examAnswered.forEach((v, i) => { if (v) examAnsweredObj[i] = true; });
                 const data = {
                     currentTopic,
                     currentIndex,
                     isExamMode,
                     isAllTopicsExam,
                     examScores,
-                    examAnswered,
+                    examAnsweredObj,
                     examSelectedIndex,
                     _correctCount,
                     qIndices,
@@ -2532,7 +2539,10 @@
             isExamMode        = data.isExamMode || false;
             isAllTopicsExam   = data.isAllTopicsExam || false;
             examScores        = data.examScores || {};
-            examAnswered      = data.examAnswered || [];
+            // Restore examAnswered from object back to array
+            const answeredObj = data.examAnsweredObj || data.examAnswered || {};
+            examAnswered = [];
+            Object.keys(answeredObj).forEach(k => { examAnswered[parseInt(k)] = true; });
             examSelectedIndex = data.examSelectedIndex || {};
             _correctCount     = data._correctCount || 0;
 
@@ -2553,16 +2563,8 @@
             document.getElementById('examModeToggle').checked = isExamMode;
             syncExamToggleFixed(isExamMode);
 
-            // Set topic header
-            const topicObj = topics.find(t => t.name === currentTopic);
-            if (isAllTopicsExam) {
-                document.getElementById('studyTopicTitle').textContent = '🏆 Full Exam — All Topics';
-                document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions across all 17 topics`;
-            } else if (topicObj) {
-                document.getElementById('studyTopicTitle').textContent = `${topicObj.icon} ${currentTopic.split(':')[1].trim()}`;
-                document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions in this topic • Master the concepts`;
-            }
             document.getElementById('searchInput').value = '';
+            updateStudyHeader();
 
             showStudyView();
             renderCard();
@@ -2700,10 +2702,8 @@
             document.getElementById('examModeToggle').checked = false;
             syncExamToggleFixed(false);
 
-            const topicObj = topics.find(t => t.name === topic);
-            document.getElementById('studyTopicTitle').textContent = `${topicObj.icon} ${topic.split(':')[1].trim()}`;
-            document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions in this topic • Master the concepts`;
             document.getElementById('searchInput').value = '';
+            updateStudyHeader();
 
             showStudyView();
             renderCard();
@@ -2766,6 +2766,13 @@
             } else {
                 document.getElementById('questionText').textContent = q.q;
                 document.getElementById('answerText').textContent = q.a;
+                const explEl = document.getElementById('explanationText');
+                if (q.e) {
+                    explEl.textContent = '💡 ' + q.e;
+                    explEl.style.display = 'block';
+                } else {
+                    explEl.style.display = 'none';
+                }
                 card.classList.remove('flipped');
             }
 
@@ -3111,7 +3118,34 @@
                 [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
             }
             currentIndex = 0;
+            // Update header to reflect shuffled state
+            updateStudyHeader();
             renderCard();
+            saveProgress();
+        }
+
+        function updateStudyHeader() {
+            if (!currentTopic) return;
+            if (isAllTopicsExam) {
+                document.getElementById('studyTopicTitle').textContent = '🏆 Full Exam — All Topics';
+                document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions across all 17 topics`;
+            } else {
+                const topicObj = topics.find(t => t.name === currentTopic);
+                const icon = topicObj ? topicObj.icon : '📖';
+                const shortName = currentTopic.split(':')[1]?.trim() || currentTopic;
+                const isShuffled = isExamMode ? false : detectShuffled();
+                document.getElementById('studyTopicTitle').textContent = `${icon} ${shortName}`;
+                document.getElementById('studyTopicDesc').textContent = isExamMode
+                    ? `${filteredQuestions.length} questions • Exam Mode`
+                    : `${filteredQuestions.length} questions${isShuffled ? ' • 🔀 Shuffled' : ''} • Flip to reveal answers`;
+            }
+        }
+
+        function detectShuffled() {
+            // Check if filteredQuestions order matches the original topic order
+            const original = allQuestions.filter(q => q.topic === currentTopic);
+            if (filteredQuestions.length !== original.length) return true;
+            return filteredQuestions.some((q, i) => q !== original[i]);
         }
 
         function toggleExamModeFixed() {
