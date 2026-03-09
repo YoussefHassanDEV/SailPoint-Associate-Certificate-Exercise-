@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdentityIQ Exam - Study System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --secondary: #f093fb;
+            --success: #4CAF50;
+            --danger: #ff6b6b;
+            --warning: #ffd93d;
+            --gray-light: #f8f9fa;
+            --gray: #6c757d;
+            --gray-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-dark);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--gray-light);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.6em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .topics-list {
+            padding: 10px 0;
+        }
+
+        .topic-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95em;
+            color: var(--gray);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .topic-item:hover::before {
+            left: 100%;
+        }
+
+        .topic-item:hover {
+            background: rgba(102, 126, 234, 0.08);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .topic-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .topic-count {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin-left: auto;
+            font-weight: 600;
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px 30px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .view {
+            display: none;
+            opacity: 0;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+            opacity: 1;
+        }
+
+        /* DASHBOARD */
+        .dashboard-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .dashboard-header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            animation: slideInUp 0.6s ease-out 0.1s both;
+        }
+
+        .dashboard-header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-weight: 300;
+            animation: slideInUp 0.6s ease-out 0.2s both;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            animation: scaleIn 0.5s ease-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            color: var(--primary);
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .stat-card p {
+            color: var(--gray);
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .topic-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-top: 5px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .topic-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: right 0.6s;
+        }
+
+        .topic-card:nth-child(2) {
+            animation-delay: 0.1s;
+            border-top-color: #f093fb;
+        }
+
+        .topic-card:nth-child(3) {
+            animation-delay: 0.2s;
+            border-top-color: #4ecdc4;
+        }
+
+        .topic-card:nth-child(4) {
+            animation-delay: 0.3s;
+            border-top-color: #ffd93d;
+        }
+
+        .topic-card:nth-child(5) {
+            animation-delay: 0.4s;
+            border-top-color: #ff6b6b;
+        }
+
+        .topic-card:nth-child(n+6) {
+            animation-delay: 0.5s;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+        }
+
+        .topic-card:hover::after {
+            right: 100%;
+        }
+
+        .topic-card h3 {
+            color: var(--gray-dark);
+            margin-bottom: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .topic-card p {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .topic-card .count {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .topic-card:hover .count {
+            transform: scale(1.1);
+        }
+
+        /* STUDY VIEW */
+        .study-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        .study-title h2 {
+            color: var(--gray-dark);
+            margin-bottom: 5px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .study-title p {
+            color: var(--gray);
+            font-size: 0.95em;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: slideInUp 0.5s ease-out 0.1s both;
+        }
+
+        .back-btn:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+        }
+
+        .card-container {
+            perspective: 1200px;
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            animation: slideInUp 0.5s ease-out 0.2s both;
+        }
+
+        .card {
+            width: 100%;
+            height: 480px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+            backface-visibility: hidden;
+            border-radius: 20px;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 1.4em;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--gray-dark);
+            font-size: 1.1em;
+            line-height: 1.8;
+            transform: rotateY(180deg);
+        }
+
+        .card-label {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.8em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-front .card-label {
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .card-back .card-label {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .flip-hint {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            font-size: 0.8em;
+            opacity: 0.6;
+            font-style: italic;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .study-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            animation: slideInUp 0.5s ease-out 0.3s both;
+            flex-wrap: wrap;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+        }
+
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 300px;
+            flex: 1;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-dark);
+            font-size: 1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--gray-light);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .filters {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            animation: slideInUp 0.5s ease-out 0.1s both;
+        }
+
+        .filters-title {
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: rgba(102, 126, 234, 0.01);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+                padding: 30px 20px;
+            }
+
+            .card {
+                height: 420px;
+            }
+
+            .card-face {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                width: 100%;
+                height: auto;
+                display: none;
+                box-shadow: none;
+                border-bottom: 2px solid var(--gray-light);
+                max-height: 60vh;
+                border-radius: 0 0 15px 15px;
+            }
+
+            .sidebar.open {
+                display: block;
+            }
+
+            .app-wrapper {
+                flex-direction: column;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .study-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .study-header > div:last-child {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .study-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+
+            .progress-section {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .card {
+                height: 350px;
+            }
+
+            .card-face {
+                padding: 30px;
+                font-size: 0.95em;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2em;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .exam-card {
+                padding: 20px;
+            }
+
+            .answer-options {
+                gap: 10px;
+            }
+
+            .results-details {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .score-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .score-circle-number {
+                font-size: 2.2em;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* TOGGLE SWITCH */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* EXAM MODE STYLES */
+        .exam-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .answer-btn {
+            padding: 14px 20px;
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(5px);
+        }
+
+        .answer-btn.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .answer-btn.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .answer-btn.correct::after {
+            content: ' ✓';
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .answer-btn.incorrect::after {
+            content: ' ✗';
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .exam-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .exam-score {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1em;
+        }
+
+        .results-screen {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .results-screen h2 {
+            font-size: 2.5em;
+            color: var(--gray-dark);
+            margin-bottom: 20px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-circle-number {
+            font-size: 3em;
+            font-weight: 700;
+        }
+
+        .results-details {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-item h4 {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .detail-item p {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--gray-dark);
+        }
+
+        .detail-item.correct p {
+            color: #28a745;
+        }
+
+        .detail-item.incorrect p {
+            color: #dc3545;
+        }
+
+        .retake-btn {
+            margin-top: 30px;
+            padding: 14px 40px;
+            font-size: 1em;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                left: -100%;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 999;
+                width: 100%;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+
+    <div class="app-wrapper">
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>📚 IdentityIQ</h1>
+                <p>Study System</p>
+            </div>
+            <div class="topics-list" id="topicsList"></div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboardView" class="view active">
+                <div class="dashboard-header">
+                    <h1>🎓 IdentityIQ Exam</h1>
+                    <p>Master the concepts with interactive flashcards</p>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <h3>300</h3>
+                        <p>Total Questions</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>17</h3>
+                        <p>Topics</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>∞</h3>
+                        <p>Learning Potential</p>
+                    </div>
+                </div>
+
+                <div style="color: white; margin-bottom: 30px;">
+                    <h2 style="font-size: 1.4em; font-weight: 700; margin-bottom: 10px;">Select a Topic to Begin</h2>
+                    <p style="opacity: 0.9; font-size: 1.05em;">Click any topic card to start your study session</p>
+                </div>
+                <div class="topics-grid" id="topicsGrid"></div>
+            </div>
+
+            <!-- STUDY VIEW -->
+            <div id="studyView" class="view">
+                <div class="study-header">
+                    <div class="study-title">
+                        <h2 id="studyTopicTitle"></h2>
+                        <p id="studyTopicDesc"></p>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                            <span style="font-weight: 600; color: var(--gray-dark);">📝 Exam Mode</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="examModeToggle" onchange="toggleExamMode()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <button class="back-btn" onclick="backToDashboard()">← Back</button>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <div class="filters-title">🔍 Search within topic</div>
+                    <input 
+                        type="text" 
+                        class="search-box" 
+                        id="searchInput" 
+                        placeholder="Search questions or answers..."
+                    >
+                </div>
+
+                <div class="card-container" id="normalCardContainer">
+                    <div class="card" id="card">
+                        <div class="card-face card-front">
+                            <div class="card-label">QUESTION</div>
+                            <div id="questionText"></div>
+                            <div class="flip-hint">Click to reveal answer</div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-label">ANSWER</div>
+                            <div id="answerText"></div>
+                            <div class="flip-hint">Click to go back</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-container" id="examCardContainer" style="display: none;"></div>
+
+                <div class="study-controls">
+                    <div class="nav-buttons">
+                        <button class="btn btn-secondary" id="prevBtn" onclick="previousCard()">← Previous</button>
+                        <button class="btn btn-secondary" onclick="shuffleCards()">🔀 Shuffle</button>
+                        <button class="btn btn-secondary" id="nextBtn" onclick="nextCard()">Next →</button>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-text"><span id="progressText">0 / 0</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXAM RESULTS VIEW -->
+            <div id="resultsView" class="view">
+                <div class="results-screen" id="resultsContent"></div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="back-btn" onclick="backToDashboard()">← Back to Topics</button>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const allQuestions = [
+            // Topic 1: Product Architecture & Core Tiers (20 Q)
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What are the three primary modules that compose IdentityIQ?", a: "IdentityIQ consists of the Compliance Manager, Lifecycle Manager (LCM), and File Access Manager."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the primary focus of the Compliance Manager?", a: "It manages certifications, policy enforcement, risk analysis, and governance controls."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What activities does the Lifecycle Manager (LCM) handle?", a: "LCM handles access requests, approvals, provisioning, and lifecycle events such as Joiner, Mover, and Leaver."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the purpose of the File Access Manager?", a: "It governs access to unstructured data, such as file shares and content systems."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Where are all IdentityIQ objects stored?", a: "All objects are stored in a relational database known as the Data Layer."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Which ORM layer does IdentityIQ use to communicate with the database?", a: "IdentityIQ uses Hibernate as the ORM layer."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the benefit of using Hibernate for the Data Layer?", a: "It allows IdentityIQ to remain database-agnostic, supporting systems like SQL Server and Oracle."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "List five examples of objects stored in the IdentityIQ database.", a: "Identities, Applications, Roles, Tasks, and Workflows."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Where do Tasks and Workflows execute in the architecture?", a: "They execute server-side on the Application Layer."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Does server-side execution require users to have direct database interaction?", a: "No, execution is managed on the application server and does not require direct user-database interaction."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What technology is used to manage the scheduled execution of background tasks?", a: "IdentityIQ uses the Quartz Scheduler."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What are the three main responsibilities of the Quartz Scheduler?", a: "Running tasks at defined intervals, managing cron-based schedules, and handling background job orchestration."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What two components are used in the Integration Layer to communicate with target systems?", a: "Connectors and integration modules."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "List four common systems supported by IdentityIQ connectors.", a: "Active Directory, LDAP, JDBC databases, and Cloud applications."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What operations do connectors enable?", a: "They enable aggregation (read) and provisioning (write) operations."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the internal object model name for Roles?", a: "Bundles."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the internal object model name for Accounts?", a: "Links."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "What is the internal object model name for Entitlements?", a: "Managed Attributes."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Why is understanding internal names essential for implementers?", a: "It is necessary for working with XML exports, database tables, and Rules."},
+            {topic: "Topic 1: Product Architecture & Core Tiers", q: "Is IdentityIQ designed to be database-agnostic?", a: "Yes, through the use of Hibernate."},
+
+            // Topic 2: Identity Cubes & Attributes (20 Q)
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What does an Identity Cube represent?", a: "It represents the complete set of information collected in IdentityIQ for a specific digital identity."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "List six types of information consolidated into an Identity Cube.", a: "Identity attributes, application accounts (Links), entitlements, roles, risk scores, and policy violations."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What are the four primary mechanisms for adding data to an Identity Cube?", a: "Data can be Discovered, Requested, Assigned, or Calculated."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "When is data 'Discovered' for a Cube?", a: "During account aggregation from connected applications."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "How is access 'Requested' for an identity?", a: "A user submits a request through the Lifecycle Manager (LCM)."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "When is data 'Assigned' to an identity?", a: "Access is automatically assigned based on identity attributes like department or title."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "When is data 'Calculated' for a Cube?", a: "Values like Risk Score and Policy Violations are computed by the system, typically during a Refresh Task."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What is the primary method for automatically creating Identity Cubes?", a: "Account aggregation from applications marked as Authoritative."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What is an Authoritative Application also known as?", a: "The System of Record."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "How many Identity Cubes are created for each authoritative account read during aggregation?", a: "Each authoritative account results in one Authoritative Identity Cube."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "From where are identity attributes populated during the standard creation process?", a: "They are populated from the authoritative application."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "Can Identity Cubes be created manually?", a: "Yes, using the Lifecycle Manager UI."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "When is manual creation of a Cube typically used?", a: "During the onboarding of identities before their accounts exist in target systems."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "Is an authoritative cube created for every account read from every application?", a: "No, they are only created for accounts from applications marked as authoritative."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What is the difference between Identity Attributes and Account Attributes?", a: "Identity attributes belong to the Identity Cube, while Account attributes belong to specific application Links."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "Give three examples of Identity Attributes.", a: "Department, manager, and job title."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "Give three examples of Account Attributes.", a: "AD group membership, accountStatus, and mailbox type."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "Where is governance logic (like policy evaluation) applied?", a: "Governance logic must use Identity Attributes."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What attributes does provisioning logic typically interact with?", a: "Provisioning logic interacts with Account Attributes."},
+            {topic: "Topic 2: Identity Cubes & Attributes", q: "What is the central governance object in IdentityIQ?", a: "The Identity Cube."},
+
+            // Topic 3: Searchable & Extended Attributes (10 Q)
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What is a Searchable Attribute?", a: "An attribute stored in its own column in the database, allowing it to be used in search criteria and reports."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What is a Non-Searchable Attribute?", a: "An attribute that is not stored in a dedicated column."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "Where are non-searchable extended attributes stored by default?", a: "They are stored in a CLOB (Character Large Object)."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "Name the three types of searchable attributes supported by IdentityIQ.", a: "Standard, Named Extended, and Placeholder Extended Attributes."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What are Standard Attributes?", a: "Attributes provided out-of-the-box, such as name and email."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What are Named Extended Attributes?", a: "Attributes stored as dedicated searchable columns suitable for structured governance."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What are Placeholder Extended Attributes?", a: "Generic columns that allow ad hoc conversion of attributes into searchable fields post-deployment."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "Is there a hard limit of 20 extended attributes in IdentityIQ?", a: "No, that is false."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "Why would an implementer mark an attribute as searchable?", a: "To improve performance for searches, filtering, and reporting."},
+            {topic: "Topic 3: Searchable & Extended Attributes", q: "What happens if you add an extended attribute but do not mark it searchable?", a: "It will be stored in the CLOB and will be more difficult to search."},
+
+            // Topic 4: Organizing Identities (15 Q)
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What are the two primary mechanisms used to organize identities?", a: "Populations and Groups."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What is the purpose of groups and populations?", a: "To specify identity subsets for activities like reports, tasks, and certifications."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Define a Population.", a: "A saved Identity Search definition that selects identities based on defined criteria."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Where are new Populations created?", a: "In the Advanced Analytics section."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What happens when you click 'Save Identities as Population'?", a: "The specific search criteria for that population is saved for reuse."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Can a population be defined based on multiple attributes?", a: "Yes, populations support multiple criteria."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What is a Group (Factory)?", a: "A subset of identities based on a shared value of a single identity attribute, such as 'Location'."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Contrast the attribute requirements of a Group versus a Population.", a: "Groups are based on a single attribute; Populations are based on flexible, multiple criteria."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What is an Account Group?", a: "A native group from a target system loaded via aggregation that grants user access in that system."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "What is a Workgroup?", a: "A group of IdentityIQ users used for assigning capabilities and scopes to support delegated administration."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Which group concept is used for assigning administrative capabilities?", a: "Workgroups."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Which group concept is loaded via account group aggregation?", a: "Account Groups."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "How are populations used in certification?", a: "They select the set of identities to be included in a certification campaign."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Are Group Factories used for task filters?", a: "Yes, they are used for task and report filters."},
+            {topic: "Topic 4: Organizing Identities (Populations & Groups)", q: "Can a Workgroup be a target for an operation like a task filter?", a: "No, typically populations and factory groups are used for that; workgroups are for authorization."},
+
+            // Topic 5: Implementation Overview & Phasing (15 Q)
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "Why is a phased approach recommended for IdentityIQ projects?", a: "To reduce risk and ensure a successful rollout by breaking the project into manageable parts."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is mandatory before a project goes live?", a: "Data cleanup."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What data elements should be cleaned up before go-live?", a: "User accounts, entitlements, catalog entries, and identity attributes."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What are the consequences of failing to clean data?", a: "Incorrect correlation, inaccurate risk scoring, and certification noise."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is the mandatory requirement for Phase 1 of any implementation?", a: "The project must include at least one authoritative data source."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "Why is an authoritative source required in Phase 1?", a: "It is needed to create and maintain the Identity Cubes that anchor all governance."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is Rapid Setup?", a: "An implementation framework introduced in IdentityIQ 8.1."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is the purpose of Rapid Setup?", a: "To allow administrators to configure common use cases and lifecycle events via the UI rather than custom code."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "Name the three common lifecycle events supported by Rapid Setup.", a: "Joiner, Mover, and Leaver."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is the Accelerator Pack?", a: "A specific implementation tool mentioned in architecture overviews."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "Does a certification campaign have to be in Phase 1?", a: "No, that is false."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is the standard configuration pattern for Rapid Setup?", a: "It uses pre-defined capabilities that can be toggled on or off via the UI."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What objects might be required before configuring a Joiner event in Rapid Setup?", a: "Roles, Workgroups, and Scopes."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "Can you configure application-specific actions in Rapid Setup?", a: "Yes, such as Active Directory account actions."},
+            {topic: "Topic 5: Implementation Overview & Phasing", q: "What is the first step in the Rapid Setup configuration process?", a: "Creating supporting objects like roles and workgroups."},
+
+            // Topic 6: Data Aggregation & Connectors (20 Q)
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Define Aggregation.", a: "The process of reading data from external systems into IdentityIQ."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is an Application in the context of aggregation?", a: "The external source system from which data is read."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "When does IdentityIQ create an Identity Cube during aggregation?", a: "When accounts are read from an application marked as authoritative."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Where are discovered entitlements stored during aggregation?", a: "In the Entitlement Catalog."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is the Entitlement Catalog?", a: "A centralized list of all entitlements and access rights available for each application."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Contrast a Connector and an Application.", a: "A connector is the technical integration component; an application is the specific configured instance inside IdentityIQ."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "List five items defined in an Application object configuration.", a: "Connector type, host/credentials, account schema, group schema, and correlation configuration."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What does an Account Schema define?", a: "It defines which account attributes (e.g., username, email) IdentityIQ should read from an application."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What should you mark an account attribute as if you want it in the Entitlement Catalog?", a: "Managed."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is the purpose of the Account Group aggregation task?", a: "To load native groups and their metadata from target systems."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is the JDBC connector?", a: "A connector used for database-based applications."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Does the JDBC connector require custom logic for provisioning?", a: "Yes, it typically requires a provisioning rule with custom SQL."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is IQService specifically used for?", a: "Windows-based provisioning and Active Directory operations requiring native Windows APIs."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Is IQService required for generic LDAP provisioning?", a: "No, it is generally not required for LDAP."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "How does IdentityIQ handle deleted accounts on target systems?", a: "Account aggregation can be configured to detect and process deleted accounts."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What are Web Services connectors used for?", a: "To integrate with target systems via their supported REST or SOAP web services."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What is the IdentityIQ Loopback Connector?", a: "A connector that treats Identity Cubes as accounts and Workgroups as entitlements to govern IdentityIQ itself."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "Can aggregation be scheduled?", a: "Yes, using the Quartz Scheduler."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What determines aggregation frequency for compliance use cases?", a: "It is often scheduled quarterly, prior to certification campaigns."},
+            {topic: "Topic 6: Data Aggregation & Connectors", q: "What determines aggregation frequency for provisioning use cases?", a: "It is often performed daily to reflect recent changes."},
+
+            // Topic 7: Account Correlation (20 Q)
+            {topic: "Topic 7: Account Correlation", q: "Define Account Correlation.", a: "The process of matching an aggregated account to an existing authoritative Identity Cube."},
+            {topic: "Topic 7: Account Correlation", q: "What is the primary goal of correlation?", a: "To ensure non-authoritative accounts are attached to the correct identity."},
+            {topic: "Topic 7: Account Correlation", q: "What happens if an account fails to correlate?", a: "A non-authoritative Identity Cube is created, and the account is marked as uncorrelated."},
+            {topic: "Topic 7: Account Correlation", q: "Name the three primary correlation mechanisms.", a: "Rapid Setup Correlation, Correlation Wizard, and Correlation Rules."},
+            {topic: "Topic 7: Account Correlation", q: "Describe Rapid Setup Correlation.", a: "A simple UI-based configuration that matches one application attribute to one identity attribute."},
+            {topic: "Topic 7: Account Correlation", q: "What is the Correlation Wizard?", a: "A tool that provides a set of ordered attribute-based correlation configuration."},
+            {topic: "Topic 7: Account Correlation", q: "What is a Correlation Rule?", a: "A snippet of code used for complex correlation logic that cannot be handled by the UI."},
+            {topic: "Topic 7: Account Correlation", q: "What is the order of precedence for correlation mechanisms?", a: "1. Rules, 2. Configuration (Wizard/Rapid Setup), 3. Default logic."},
+            {topic: "Topic 7: Account Correlation", q: "What happens during 'Positive Correlation'?", a: "The aggregated account is attached to an existing Identity Cube."},
+            {topic: "Topic 7: Account Correlation", q: "What is 'Unsuccessful Correlation'?", a: "A new cube is created and marked as uncorrelated because no match was found."},
+            {topic: "Topic 7: Account Correlation", q: "How can unsuccessful correlation be resolved?", a: "By fixing the logic/rule or by performing manual correlation."},
+            {topic: "Topic 7: Account Correlation", q: "Does the Prune Identity task perform correlation?", a: "No, it cleans up unused identities after correlation has been resolved."},
+            {topic: "Topic 7: Account Correlation", q: "When does correlation actually occur?", a: "During the aggregation process."},
+            {topic: "Topic 7: Account Correlation", q: "What is Manual Correlation?", a: "The process of manually assigning accounts to identities via the UI."},
+            {topic: "Topic 7: Account Correlation", q: "Is manual correlation persistent?", a: "Yes, it is not undone or overridden by subsequent aggregations."},
+            {topic: "Topic 7: Account Correlation", q: "Can manual correlation be changed?", a: "Yes, it can be manually changed using the 'Move Account' feature."},
+            {topic: "Topic 7: Account Correlation", q: "What is Manager Correlation?", a: "The process of matching a manager attribute from an account to an existing Identity Cube."},
+            {topic: "Topic 7: Account Correlation", q: "Why is manager correlation important?", a: "It establishes the management hierarchy used for approvals and certifications."},
+            {topic: "Topic 7: Account Correlation", q: "What is a common example of correlation logic?", a: "Matching 'email' from an application to the 'Email' attribute on the Identity Cube."},
+            {topic: "Topic 7: Account Correlation", q: "Can you correlate based on conditions, such as 'serviceAcct = true'?", a: "Yes, using the Correlation Wizard."},
+
+            // Topic 8: Certification & Access Reviews (20 Q)
+            {topic: "Topic 8: Certification & Access Reviews", q: "Define Certification.", a: "The process of reviewing an identity's accounts and entitlements to ensure access is appropriate."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is the purpose of Certification?", a: "To maintain governance and compliance by validating user access."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "Who is typically responsible for performing certifications?", a: "Managers or application owners."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "Contrast Certification and Access Review.", a: "Certification is the overall process; Access Review is the specific task performed by a reviewer."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "List the six stages of the Certification Lifecycle.", a: "1. Generation, 2. Staging (Optional), 3. Active Period, 4. Challenge Phase (Optional), 5. Signoff, 6. Revocation."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What happens during the 'Generation' phase?", a: "The certification items are created based on defined schedules and populations."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is the purpose of the 'Staging' phase?", a: "To allow administrators to review and adjust the certification before it goes live to reviewers."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is the 'Active Period'?", a: "The timeframe when reviewers can make Approve or Revoke decisions."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is the 'Challenge Phase'?", a: "A period where users can dispute revocation decisions before they are finalized."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What does 'Signoff' indicate?", a: "It confirms that the review phase is complete and decisions are finalized."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What happens during the 'Revocation' phase?", a: "Revocation decisions are executed, either automatically by a connector or manually via work items."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What critical task must run to advance certification phases?", a: "The Perform Maintenance task."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What happens if the Perform Maintenance task does not run?", a: "Certification processes will stall and not move to the next phase."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "Name two common review decisions an approver can make.", a: "Approve and Revoke."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "Can certifications be triggered by lifecycle events?", a: "Yes, as part of a governance process."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is the 'Active Decision' in certification?", a: "It refers to the specific action taken by a reviewer on an entitlement."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is a certification campaign?", a: "A structured series of access reviews targeting a specific population or application."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "Does aggregation need to occur before a certification campaign?", a: "Yes, to ensure reviewers are seeing current data."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "What is 'Certification Noise'?", a: "Excessive or unnecessary review items caused by poor data cleanup."},
+            {topic: "Topic 8: Certification & Access Reviews", q: "How does IdentityIQ handle dispute resolution during certification?", a: "Through the Challenge Phase."},
+
+            // Topic 9: Roles & Business Modeling (20 Q)
+            {topic: "Topic 9: Roles & Business Modeling", q: "What do Roles represent in IdentityIQ?", a: "A user's responsibilities within the enterprise."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What is the primary benefit of using roles?", a: "They group related access rights together, simplify access management, and enforce consistent models."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Describe the standard 2-Tier Role Model.", a: "It consists of Tier 1 (Business Roles) and Tier 2 (IT Roles)."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What do Business Roles represent?", a: "Job-based or functional access, such as 'Finance Analyst'."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What do IT Roles represent?", a: "Technical access on target systems, such as 'SAP_FI_Read'."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What is a Birthright Role?", a: "Baseline access assigned automatically during a Joiner event, such as email or VPN."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Are Birthright Roles typically requestable?", a: "No, they are baseline and usually static."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Are Business Roles requestable?", a: "Yes, they represent job-based access that can be requested via LCM."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Define a 'Required' relationship in a business role.", a: "A mandatory IT role that is automatically assigned when the business role is assigned."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Can a 'Required' IT role be removed independently of its business role?", a: "No."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Define a 'Permitted' relationship in a business role.", a: "An IT role that a user is allowed to request because they have the business role, but it is not auto-assigned."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "When are role assignments and detections processed?", a: "During the Identity Refresh task."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What is 'Role Detection'?", a: "The system identifies that a user has all the entitlements belonging to a role and 'detects' that they have that role."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Why are roles assigned as a single unit?", a: "To ensure users receive all necessary access for their job function simultaneously."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What is the internal name for a Role?", a: "Bundle."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Does a Business Role directly contain entitlements?", a: "No, it typically contains IT roles, which then contain the entitlements."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "How does role modeling reduce risk?", a: "By enforcing a consistent, governed access model and reducing Separation of Duties (SoD) risk."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Mark needs temporary access to purchase project tickets; what role type is used?", a: "A Business Role."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "Why use roles instead of direct entitlement assignments?", a: "Roles provide better visibility, safer deprovisioning, and a scalable lifecycle."},
+            {topic: "Topic 9: Roles & Business Modeling", q: "What is the operational dependency for role recalculation?", a: "The Identity Refresh task."},
+
+            // Topic 10: Policy & Risk Analysis (15 Q)
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What is a Risk Score?", a: "A measurable indicator of access-related risk assigned to an identity."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "How is a Risk Score calculated?", a: "Numerical values assigned to entitlements and roles are combined."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What are the two primary policy usage modes?", a: "Compliance (Detective Mode) and Provisioning (Preventive Mode)."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What happens in 'Detective Mode'?", a: "The system identifies violations after they have occurred."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What happens in 'Preventive Mode'?", a: "The system blocks access requests that would cause a policy violation."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What is a Separation of Duties (SoD) policy?", a: "A policy that prevents a user from having conflicting sets of access, such as creating and approving a vendor."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "List two other common policy examples.", a: "Incorrect Responsibilities and Multiple Accounts."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "Where are policy violations stored?", a: "On the Identity Cube."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "When are policy violations typically detected?", a: "During a Refresh Task or when using Preventive Mode in a workflow."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What task updates an identity's risk score?", a: "The Identity Refresh task."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "Can a policy violation trigger a workflow?", a: "Yes, violations can trigger remediation workflows."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What is a 'Managed Entitlement'?", a: "An entitlement with additional metadata used for risk scoring and policy."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "What is 'Certification Noise' in relation to policy?", a: "Reviewing violations that should have been caught by detective controls."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "Does IdentityIQ assign numerical values to all entitlements for risk?", a: "Yes, values can be assigned to entitlements, roles, and other elements."},
+            {topic: "Topic 10: Policy & Risk Analysis", q: "Is risk scoring calculated during aggregation?", a: "No, it is usually computed during Refresh."},
+
+            // Topic 11: Lifecycle Management (LCM) (20 Q)
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What are Lifecycle Events?", a: "Activities that occur during a person's employment, such as Joiner, Mover, and Leaver."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What triggers a Joiner event?", a: "The creation of a new identity record, usually from an authoritative source."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What are common automated actions for a Joiner?", a: "Creating AD/Email accounts and assigning birthright roles."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What triggers a Mover event?", a: "Changes to identity attributes like department, location, or manager."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What are common automated actions for a Mover?", a: "Removing old access and assigning new birthright roles."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What triggers a Leaver event?", a: "The termination of an employee, often indicated by a status change in the HR system."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What are common automated actions for a Leaver?", a: "Disabling accounts, removing access, and deleting sensitive links."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "How does IdentityIQ detect lifecycle events?", a: "During account aggregation or attribute changes that are then processed by a Refresh Task."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What task setting is required to process lifecycle events?", a: "The 'Process Events' option must be enabled in the Identity Refresh task."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "Can users request their own lifecycle changes?", a: "Yes, through LCM self-service requests like 'Edit Identity'."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is a 'WorkflowCase'?", a: "A specific instance of a business process executing for a target user."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "How are WorkflowCases handled if a manager requests access for three employees?", a: "IdentityIQ creates three separate WorkflowCases, one for each target user."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is the 'Track My Requests' page?", a: "A UI component for monitoring the status of submitted lifecycle requests."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What are 'Internal Actions' in a Leaver event?", a: "Actions taken within IdentityIQ, such as disabling the user's login capabilities."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is the 'Identity Event History'?", a: "An audit log of all lifecycle-related actions taken on an identity."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is the Governance Process in LCM?", a: "Security steps like approvals and policy checks executed during the lifecycle."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "Can Rapid Setup be used for custom lifecycle events?", a: "Yes, custom events can be configured beyond the standard three."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is a 'Mover' trigger example?", a: "A change in the 'managerId' attribute."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "Does a Leaver event always delete the Identity Cube?", a: "No, it typically disables access and retains the cube for audit history."},
+            {topic: "Topic 11: Lifecycle Management (LCM)", q: "What is the flow of a Joiner event?", a: "HR change → Aggregation → Cube created → Refresh detects Joiner → Birthright assignment → Connector execution."},
+
+            // Topic 12: Provisioning (20 Q)
+            {topic: "Topic 12: Provisioning", q: "Define Provisioning.", a: "The process of writing access changes back to enterprise applications."},
+            {topic: "Topic 12: Provisioning", q: "What is the execution layer of IdentityIQ?", a: "Provisioning."},
+            {topic: "Topic 12: Provisioning", q: "List four common provisioning operations.", a: "Account creation, modification, disabling/deleting, and entitlement management."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'User-Driven' provisioning initiator?", a: "A change triggered by a user in the UI, such as an access request."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Data-Driven' provisioning initiator?", a: "A change triggered by data updates, such as an HR attribute change leading to role recalculation."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Provisioning Plan'?", a: "A technical object that describes the set of changes to be applied to target systems."},
+            {topic: "Topic 12: Provisioning", q: "Does provisioning occur before or after approval?", a: "No provisioning occurs until the approval process is complete."},
+            {topic: "Topic 12: Provisioning", q: "What are the three steps in the Provisioning Engine process?", a: "Expansion, Filtering, and Channel Selection."},
+            {topic: "Topic 12: Provisioning", q: "What happens during the 'Expansion' step?", a: "The engine breaks down high-level requests (like roles) into specific account-level entitlements."},
+            {topic: "Topic 12: Provisioning", q: "What happens during the 'Filtering' step?", a: "The engine removes requests for access the user already possesses."},
+            {topic: "Topic 12: Provisioning", q: "What happens during 'Channel Selection'?", a: "The engine determines whether to send the request via an automated connector or a manual work item."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Provisioning Policy'?", a: "A configuration that defines how to provide values required for account operations on a specific application."},
+            {topic: "Topic 12: Provisioning", q: "Can provisioning values be auto-calculated?", a: "Yes, they can be static or calculated by the system."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Native Change'?", a: "A data change discovered on a target system during aggregation that was not initiated by IdentityIQ."},
+            {topic: "Topic 12: Provisioning", q: "Why is native change monitoring important?", a: "To detect undesired or out-of-process access changes."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Provisioning Transaction'?", a: "The actual execution of a change via a connector."},
+            {topic: "Topic 12: Provisioning", q: "What should you monitor daily regarding provisioning?", a: "Failed transactions and transactions stuck in retry."},
+            {topic: "Topic 12: Provisioning", q: "Can an application be forced to use manual provisioning?", a: "Yes, by removing 'PROVISIONING' from its feature string, forcing work items."},
+            {topic: "Topic 12: Provisioning", q: "What is 'Manual Revocation'?", a: "Access removal that requires a human to perform the action and mark a work item as complete."},
+            {topic: "Topic 12: Provisioning", q: "What is a 'Provisioning Rule'?", a: "Custom code used to handle complex provisioning requirements for specific connectors."},
+
+            // Topic 13: Tasks, Workflows, & Rules (20 Q)
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What are Tasks?", a: "Background jobs that operate similarly to batch processes without user interaction."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Can tasks be scheduled?", a: "Yes, or they can be run manually."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "List three common task uses.", a: "Aggregation, Identity Refresh, and Reporting."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is the primary difference between a task and a workflow?", a: "Tasks are batch processes; workflows are process-driven and often involve user interaction."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Define Workflows (Business Processes).", a: "A runnable, repeatable set of steps designed to perform structured work."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What triggers a workflow?", a: "System events (like lifecycle changes) or user requests."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Name two tasks that are operational backbones of IdentityIQ.", a: "Aggregation and Identity Refresh."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is the 'Perform Maintenance' task?", a: "A critical system task that advances certifications and handles remediations."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is the 'Sequential Task Launcher'?", a: "A task used to run an ordered chain of other tasks."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What are Rules?", a: "User-defined code snippets used to inject custom logic without modifying the core product."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Where are rules executed?", a: "At defined extension points, such as correlation or provisioning."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is 'Rule-defined code' written in?", a: "Beanshell."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Who is responsible for monitoring tasks in a production environment?", a: "The system administrator."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Who typically configures tasks during a project?", a: "The implementation team."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What are 'Task Templates'?", a: "Out-of-the-box configurations used to create specific task instances."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Can custom tasks be developed?", a: "Yes, for environment-specific needs."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "Can custom workflows be developed?", a: "Yes."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is the 'Check Active Policies' task?", a: "It refreshes the policy violation status for all identities."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What is the 'Prune Identity Cubes' task?", a: "It deletes identities with no account links or important references."},
+            {topic: "Topic 13: Tasks, Workflows, & Rules", q: "What task recalculates risk scores?", a: "The Identity Refresh task (specifically the Risk Score calculation option)."},
+
+            // Topic 14: Security & Authentication (15 Q)
+            {topic: "Topic 14: Security & Authentication", q: "Does IdentityIQ separate authentication from authorization?", a: "Yes."},
+            {topic: "Topic 14: Security & Authentication", q: "What is Native IdentityIQ Authentication?", a: "It validates against internal hashed records stored in the IdentityIQ database."},
+            {topic: "Topic 14: Security & Authentication", q: "What is Rule-Based Authentication?", a: "A method where a custom rule determines if a user should be authenticated."},
+            {topic: "Topic 14: Security & Authentication", q: "What is the critical security requirement for Rule-Based Auth?", a: "It must be controlled by a trusted reverse proxy with strict network controls."},
+            {topic: "Topic 14: Security & Authentication", q: "Does IdentityIQ natively enforce multi-factor authentication (MFA)?", a: "No, but it supports MFA when integrated with an external Identity Provider (IdP)."},
+            {topic: "Topic 14: Security & Authentication", q: "What answers the question 'What are you allowed to do?'?", a: "Authorization."},
+            {topic: "Topic 14: Security & Authentication", q: "What are Capabilities?", a: "Sets of permissions that define which administrative actions a user can take."},
+            {topic: "Topic 14: Security & Authentication", q: "What are Scopes?", a: "Authorization controls that define which identities or objects a user can see/act upon."},
+            {topic: "Topic 14: Security & Authentication", q: "What are Quicklink Populations?", a: "Authorization controls that define which UI shortcuts (Quicklinks) are visible to which users."},
+            {topic: "Topic 14: Security & Authentication", q: "What is delegated administration?", a: "Assigning specific governance tasks to a subset of users, often via Workgroups."},
+            {topic: "Topic 14: Security & Authentication", q: "Should direct capabilities be assigned to individuals?", a: "No, it is a best practice to assign them via Workgroups."},
+            {topic: "Topic 14: Security & Authentication", q: "Is native authentication recommended for production?", a: "No, it is often avoided in favor of SSO or SAML."},
+            {topic: "Topic 14: Security & Authentication", q: "What is 'Pass-through authentication'?", a: "Delegating authentication to a target system, supported by some connectors."},
+            {topic: "Topic 14: Security & Authentication", q: "How does Password Interception work?", a: "An interceptor client is installed on a system (like AD) to capture and sync password changes."},
+            {topic: "Topic 14: Security & Authentication", q: "What is the 'Password Intercept' business process?", a: "The workflow that handles syncing captured passwords to other applications."},
+
+            // Topic 15: Monitoring, Logging, & Troubleshooting (15 Q)
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is the Administrator Console?", a: "A UI component used for monitoring task performance and the system environment."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What can you see on the Environment Page?", a: "Statistics on hosts, application status, and installed modules."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is the recommended approach for logging in IdentityIQ?", a: "Using Log4j."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "List five Log4j logging levels from least critical to most critical.", a: "TRACE, DEBUG, INFO, WARN, ERROR, FATAL."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is Standard Output Logging?", a: "Logging that writes directly to the console or system logs, often used for debugging."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is Audit Logging?", a: "A persistent log of governance-related actions, such as access requests and certifications."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is Email Logging?", a: "Configuration that redirects emails to logs for troubleshooting purposes."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "List four factors for successful troubleshooting.", a: "Being Detail-Oriented, System Familiarity, Methodical Testing, and Environmental Awareness."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is the IdentityIQ Console?", a: "A command-line interface tool used for advanced administration and troubleshooting."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What are the IdentityIQ Debug Pages?", a: "Internal pages used to inspect and modify objects directly for troubleshooting."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What should you investigate if provisioning transactions are failing?", a: "Connector failures and long-running workflow cases."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What is a 'Delta Refresh'?", a: "An option to refresh only identities that have changed since the last run to improve performance."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "Can you dump a stack trace from the Administrator Console?", a: "Yes, for running tasks."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "What should you monitor regarding WorkflowCases?", a: "Cases that are missing cleanup or are in a deadlocked state."},
+            {topic: "Topic 15: Monitoring, Logging, & Troubleshooting", q: "How can you track aging work items?", a: "Via the Administrator Console or specific system reports."},
+
+            // Topic 16: Resources & Continuing Education (10 Q)
+            {topic: "Topic 16: Resources & Continuing Education", q: "What is SailPoint Compass?", a: "A collaborative customer and partner community for sharing product knowledge."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "List four things found on Compass.", a: "Discussion forums, technical whitepapers, product releases, and support cases."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "What is Identity University?", a: "A resource for self-paced training materials and open enrollment courses."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "What are SailPoint Expert Services?", a: "Professional services used to augment technical implementation teams."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "Who is a CSM/PSM?", a: "A Customer/Partner Success Manager who acts as a SailPoint advocate."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "What is the introductory course for IdentityIQ?", a: "IdentityIQ Introduction."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "Name the course focused on custom business logic.", a: "IdentityIQ Implementation: Rules, Scripts, & API."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "Name the course focused on complex provisioning.", a: "IdentityIQ Implementation: Advanced Provisioning & Workflows."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "Is there a course for Business Administrators?", a: "Yes, specific courses exist for Certifications and Policy."},
+            {topic: "Topic 16: Resources & Continuing Education", q: "Where can you register for Open Enrollment courses?", a: "Identity University."},
+
+            // Topic 17: Miscellaneous Operational Q&A (25 Q)
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'sunset request'?", a: "A request that includes an expiration date for access."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'WorkItemChallenge'?", a: "A work item created when a user disputes a revocation during certification."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "How does IdentityIQ remain database-agnostic?", a: "Through the abstraction provided by the Hibernate ORM layer."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What are 'Links' in the internal object model?", a: "Application accounts."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Contrast 'Managed' vs 'Unmanaged' entitlements.", a: "Managed entitlements have catalog metadata; unmanaged ones are simple values read from a system."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Is certification Part of Phase 1 requirements?", a: "No."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is mandatory before going live?", a: "Data cleanup."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What does the 'Perform Identity Request Maintenance' task do?", a: "It manages the lifecycle and cleanup of identity requests."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'clob' used for?", a: "Storing non-searchable extended attribute data."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Can Identity Cubes be requested through LCM?", a: "Yes, for new hires."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Does JDBC provisioning require a rule?", a: "Yes, typically."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Is IQService needed for LDAP?", a: "No."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is 'Move Account'?", a: "A feature to manually re-correlate an account to a different cube."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is an 'Access Review'?", a: "The specific review task performed by a human during certification."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What indicates finalized decisions in a certification?", a: "Signoff."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is 'Baseline Access'?", a: "Fundamental access given to all users, often called Birthright."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'Provisioning Initiator'?", a: "An event or action that starts a provisioning process."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Does an access request cause plan generation?", a: "Yes, once approved."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What are aging work items?", a: "Work items that have remained unresolved for a long period, representing risk."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'Joiner' event configuration eligibility?", a: "Rules that define which identities are eligible for Joiner processing."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is a 'Leaver' event internal action?", a: "Disabling the identity within IdentityIQ."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is 'Session Affinity'?", a: "A load balancer configuration that keeps a user's session on a specific application server."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "Why is tiers-segregation used in architecture?", a: "For processing and storage efficiency/security."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What is the 'Services Standard Build' (SSB)?", a: "A standard deployment framework for IdentityIQ."},
+            {topic: "Topic 17: Miscellaneous Operational Q&A", q: "What course validates knowledge from the Essentials course?", a: "The certification or advanced courses."}
+        ];
+
+        const topics = [
+            { name: "Topic 1: Product Architecture & Core Tiers", icon: "🏗️", color: "#667eea" },
+            { name: "Topic 2: Identity Cubes & Attributes", icon: "📦", color: "#f093fb" },
+            { name: "Topic 3: Searchable & Extended Attributes", icon: "🔍", color: "#4ecdc4" },
+            { name: "Topic 4: Organizing Identities (Populations & Groups)", icon: "👥", color: "#ffd93d" },
+            { name: "Topic 5: Implementation Overview & Phasing", icon: "📋", color: "#ff6b6b" },
+            { name: "Topic 6: Data Aggregation & Connectors", icon: "🔗", color: "#667eea" },
+            { name: "Topic 7: Account Correlation", icon: "🔄", color: "#f093fb" },
+            { name: "Topic 8: Certification & Access Reviews", icon: "✅", color: "#4ecdc4" },
+            { name: "Topic 9: Roles & Business Modeling", icon: "👔", color: "#ffd93d" },
+            { name: "Topic 10: Policy & Risk Analysis", icon: "⚠️", color: "#ff6b6b" },
+            { name: "Topic 11: Lifecycle Management (LCM)", icon: "🔁", color: "#667eea" },
+            { name: "Topic 12: Provisioning", icon: "⚙️", color: "#f093fb" },
+            { name: "Topic 13: Tasks, Workflows, & Rules", icon: "⚡", color: "#4ecdc4" },
+            { name: "Topic 14: Security & Authentication", icon: "🔐", color: "#ffd93d" },
+            { name: "Topic 15: Monitoring, Logging, & Troubleshooting", icon: "📊", color: "#ff6b6b" },
+            { name: "Topic 16: Resources & Continuing Education", icon: "📚", color: "#667eea" },
+            { name: "Topic 17: Miscellaneous Operational Q&A", icon: "❓", color: "#f093fb" }
+        ];
+
+        let filteredQuestions = [];
+        let currentIndex = 0;
+        let currentTopic = null;
+        let isExamMode = false;
+        let examScores = {};
+        let examAnswered = [];
+
+        function toggleExamMode() {
+            isExamMode = document.getElementById('examModeToggle').checked;
+            examScores = {};
+            examAnswered = [];
+            currentIndex = 0;
+
+            const normalContainer = document.getElementById('normalCardContainer');
+            const examContainer = document.getElementById('examCardContainer');
+            const controls = document.querySelector('.study-controls');
+            const filters = document.querySelector('.filters');
+
+            if (isExamMode) {
+                normalContainer.style.display = 'none';
+                examContainer.style.display = 'flex';
+                filters.style.display = 'none';
+            } else {
+                normalContainer.style.display = 'flex';
+                examContainer.style.display = 'none';
+                filters.style.display = 'block';
+            }
+
+            renderCard();
+        }
+
+        function initDashboard() {
+            const topicsGrid = document.getElementById('topicsGrid');
+            topicsGrid.innerHTML = '';
+
+            const topicCounts = {};
+            allQuestions.forEach(q => {
+                topicCounts[q.topic] = (topicCounts[q.topic] || 0) + 1;
+            });
+
+            topics.forEach((topicObj, index) => {
+                const card = document.createElement('div');
+                card.className = 'topic-card';
+                const count = topicCounts[topicObj.name] || 0;
+                card.innerHTML = `
+                    <div style="font-size: 2.5em; margin-bottom: 15px;">${topicObj.icon}</div>
+                    <h3>${topicObj.name.split(':')[1].trim()}</h3>
+                    <p style="color: #999; font-size: 0.85em; margin-bottom: 20px;">${topicObj.name.split(':')[0]}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="count">${count} Q's</span>
+                        <span style="font-size: 1.5em; opacity: 0; transition: all 0.3s; transform: translateX(-10px);">→</span>
+                    </div>
+                `;
+                
+                card.style.borderTopColor = topicObj.color;
+                card.onmouseenter = function() {
+                    this.querySelector('span:last-child').style.opacity = '1';
+                    this.querySelector('span:last-child').style.transform = 'translateX(0)';
+                };
+                card.onmouseleave = function() {
+                    this.querySelector('span:last-child').style.opacity = '0';
+                    this.querySelector('span:last-child').style.transform = 'translateX(-10px)';
+                };
+                
+                card.onclick = () => startTopic(topicObj.name);
+                topicsGrid.appendChild(card);
+            });
+
+            renderTopicsList();
+        }
+
+        function renderTopicsList() {
+            const topicsList = document.getElementById('topicsList');
+            topicsList.innerHTML = '';
+
+            topics.forEach((topicObj, index) => {
+                const item = document.createElement('div');
+                item.className = 'topic-item' + (currentTopic === topicObj.name ? ' active' : '');
+                const count = allQuestions.filter(q => q.topic === topicObj.name).length;
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.justifyContent = 'space-between';
+                item.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.2em;">${topicObj.icon}</span>
+                        <span>${topicObj.name.split(':')[1].trim().substring(0, 18)}...</span>
+                    </span>
+                    <span class="topic-count">${count}</span>
+                `;
+                item.onclick = () => startTopic(topicObj.name);
+                topicsList.appendChild(item);
+            });
+        }
+
+        function startTopic(topic) {
+            currentTopic = topic;
+            filteredQuestions = allQuestions.filter(q => q.topic === topic);
+            currentIndex = 0;
+            isExamMode = false;
+            examScores = {};
+            examAnswered = [];
+            document.getElementById('examModeToggle').checked = false;
+
+            const topicObj = topics.find(t => t.name === topic);
+            document.getElementById('studyTopicTitle').textContent = `${topicObj.icon} ${topic.split(':')[1].trim()}`;
+            document.getElementById('studyTopicDesc').textContent = `${filteredQuestions.length} questions in this topic • Master the concepts`;
+            document.getElementById('searchInput').value = '';
+
+            showStudyView();
+            renderCard();
+            renderTopicsList();
+            closeMenu();
+        }
+
+        function backToDashboard() {
+            currentTopic = null;
+            filteredQuestions = [];
+            isExamMode = false;
+            examScores = {};
+            examAnswered = [];
+            document.getElementById('dashboardView').classList.add('active');
+            document.getElementById('studyView').classList.remove('active');
+            document.getElementById('resultsView').classList.remove('active');
+            renderTopicsList();
+            closeMenu();
+        }
+
+        function showStudyView() {
+            document.getElementById('dashboardView').classList.remove('active');
+            document.getElementById('studyView').classList.add('active');
+            document.getElementById('resultsView').classList.remove('active');
+            
+            // Initialize container states
+            document.getElementById('normalCardContainer').style.display = 'flex';
+            document.getElementById('examCardContainer').style.display = 'none';
+        }
+
+        function renderCard() {
+            if (filteredQuestions.length === 0) {
+                document.getElementById('questionText').textContent = 'No questions found.';
+                document.getElementById('answerText').textContent = '';
+                return;
+            }
+
+            const card = document.getElementById('card');
+            const q = filteredQuestions[currentIndex];
+
+            if (isExamMode) {
+                renderExamCard(q);
+            } else {
+                document.getElementById('questionText').textContent = q.q;
+                document.getElementById('answerText').textContent = q.a;
+                card.classList.remove('flipped');
+            }
+
+            updateProgress();
+        }
+
+        function renderExamCard(q) {
+            const examContainer = document.getElementById('examCardContainer');
+            
+            let html = `
+                <div class="exam-card">
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="color: var(--gray-dark); font-size: 1.1em;">Question ${currentIndex + 1} of ${filteredQuestions.length}</h3>
+                            <span style="background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">Exam Mode</span>
+                        </div>
+                        <p style="color: var(--gray); font-size: 0.9em; font-weight: 500;">Score: ${Object.values(examScores).filter(s => s === true).length} / ${filteredQuestions.length}</p>
+                    </div>
+                    <h2 style="color: var(--gray-dark); font-size: 1.3em; margin-bottom: 25px; line-height: 1.6;">${q.q}</h2>
+                    <div class="answer-options">
+                        <button class="answer-btn" onclick="submitAnswer(0, '${q.a.replace(/'/g, "\\'")}', ${currentIndex})" ${examAnswered[currentIndex] ? 'disabled' : ''}>
+                            A) ${q.a}
+                        </button>
+                        <button class="answer-btn" onclick="submitAnswer(1, '${q.a.replace(/'/g, "\\'")}', ${currentIndex})" ${examAnswered[currentIndex] ? 'disabled' : ''}>
+                            B) ${generateWrongAnswer(q, 1)}
+                        </button>
+                        <button class="answer-btn" onclick="submitAnswer(2, '${q.a.replace(/'/g, "\\'")}', ${currentIndex})" ${examAnswered[currentIndex] ? 'disabled' : ''}>
+                            C) ${generateWrongAnswer(q, 2)}
+                        </button>
+                        <button class="answer-btn" onclick="submitAnswer(3, '${q.a.replace(/'/g, "\\'")}', ${currentIndex})" ${examAnswered[currentIndex] ? 'disabled' : ''}>
+                            D) ${generateWrongAnswer(q, 3)}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            examContainer.innerHTML = html;
+
+            // Apply styling to answered buttons
+            if (examAnswered[currentIndex]) {
+                const buttons = examContainer.querySelectorAll('.answer-btn');
+                buttons.forEach((btn, idx) => {
+                    if (examScores[currentIndex] && btn.textContent.includes(q.a)) {
+                        btn.classList.add('correct');
+                    } else if (!examScores[currentIndex] && btn.classList.contains('selected')) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+            }
+        }
+
+        function generateWrongAnswer(question, index) {
+            const wrongAnswers = [
+                "It is used for system configuration and data synchronization.",
+                "A process that occurs during the provisioning phase.",
+                "It manages access requests and user certifications.",
+                "A compliance framework for governance and risk management.",
+                "It controls the authentication mechanisms in the system.",
+                "A temporary storage for identity and access data.",
+                "It enables communication with external systems."
+            ];
+            return wrongAnswers[(index + currentIndex) % wrongAnswers.length];
+        }
+
+        function submitAnswer(selectedIndex, correctAnswer, questionIndex) {
+            const buttons = document.querySelectorAll('.answer-btn');
+            const isCorrect = selectedIndex === 0;
+            
+            examScores[questionIndex] = isCorrect;
+            examAnswered[questionIndex] = true;
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === 0) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            // Update progress
+            updateProgress();
+
+            // Auto move to next question after 2 seconds
+            setTimeout(() => {
+                if (currentIndex < filteredQuestions.length - 1) {
+                    nextCard();
+                } else {
+                    showExamResults();
+                }
+            }, 2000);
+        }
+
+        function showExamResults() {
+            document.getElementById('studyView').classList.remove('active');
+            document.getElementById('resultsView').classList.add('active');
+
+            const correctCount = Object.values(examScores).filter(s => s === true).length;
+            const totalCount = filteredQuestions.length;
+            const percentage = Math.round((correctCount / totalCount) * 100);
+
+            let resultMessage = '';
+            if (percentage >= 80) {
+                resultMessage = '🎉 Excellent! You passed!';
+            } else if (percentage >= 60) {
+                resultMessage = '👍 Good effort! Keep practicing!';
+            } else {
+                resultMessage = '📚 Review and try again!';
+            }
+
+            const html = `
+                <h2>${resultMessage}</h2>
+                <div class="score-circle">
+                    <div class="score-circle-number">${percentage}%</div>
+                </div>
+                <div class="results-details">
+                    <div class="detail-item correct">
+                        <h4>Correct</h4>
+                        <p>${correctCount}</p>
+                    </div>
+                    <div class="detail-item incorrect">
+                        <h4>Incorrect</h4>
+                        <p>${totalCount - correctCount}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h4>Total</h4>
+                        <p>${totalCount}</p>
+                    </div>
+                </div>
+                <button class="btn retake-btn" onclick="retakeExam()">🔄 Retake Exam</button>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = html;
+        }
+
+        function retakeExam() {
+            isExamMode = true;
+            examScores = {};
+            examAnswered = [];
+            currentIndex = 0;
+            document.getElementById('resultsView').classList.remove('active');
+            document.getElementById('studyView').classList.add('active');
+            renderCard();
+        }
+
+        function updateProgress() {
+            const current = currentIndex + 1;
+            const total = filteredQuestions.length;
+            
+            if (isExamMode) {
+                const correct = Object.values(examScores).filter(s => s === true).length;
+                document.getElementById('progressText').innerHTML = `<strong style="font-size: 1.2em;">${correct} / ${total}</strong>`;
+            } else {
+                document.getElementById('progressText').innerHTML = `<strong style="font-size: 1.2em;">${current}</strong> <span style="opacity: 0.7;">of</span> <strong style="font-size: 1.2em;">${total}</strong>`;
+            }
+
+            const percentage = (current / total) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+
+            document.getElementById('prevBtn').disabled = currentIndex === 0 || isExamMode;
+            document.getElementById('nextBtn').disabled = currentIndex === total - 1 || isExamMode;
+        }
+
+        function nextCard() {
+            if (isExamMode) {
+                if (currentIndex < filteredQuestions.length - 1 && examAnswered[currentIndex]) {
+                    currentIndex++;
+                    renderCard();
+                }
+            } else {
+                if (currentIndex < filteredQuestions.length - 1) {
+                    currentIndex++;
+                    renderCard();
+                }
+            }
+        }
+
+        function previousCard() {
+            if (!isExamMode && currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            }
+        }
+
+        function shuffleCards() {
+            if (isExamMode) return; // Don't allow shuffle in exam mode
+            for (let i = filteredQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
+            }
+            currentIndex = 0;
+            renderCard();
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function closeMenu() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // Setup card click after page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const cardElement = document.getElementById('card');
+            if (cardElement) {
+                cardElement.addEventListener('click', function() {
+                    if (!isExamMode) {
+                        this.classList.toggle('flipped');
+                    }
+                });
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (!currentTopic) return;
+
+            const topicQuestions = allQuestions.filter(q => q.topic === currentTopic);
+            filteredQuestions = topicQuestions.filter(q =>
+                q.q.toLowerCase().includes(searchTerm) ||
+                q.a.toLowerCase().includes(searchTerm)
+            );
+            currentIndex = 0;
+            renderCard();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('studyView').classList.contains('active')) {
+                if (!isExamMode) {
+                    if (e.key === 'ArrowRight') nextCard();
+                    if (e.key === 'ArrowLeft') previousCard();
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        document.getElementById('card').classList.toggle('flipped');
+                    }
+                }
+            }
+        });
+
+        // Initialize
+        initDashboard();
+    </script>
+</body>
+</html>
