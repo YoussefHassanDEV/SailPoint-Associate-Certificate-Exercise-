@@ -2861,11 +2861,11 @@
                         <span id="_eExIcon" style="font-size:1.4em;flex-shrink:0;margin-top:1px;"></span>
                         <div style="flex:1;">
                             <div id="_eExLabel" style="font-weight:700;margin-bottom:5px;font-size:0.85em;letter-spacing:.4px;text-transform:uppercase;"></div>
-                            <div id="_eExText" style="opacity:0.92;margin-bottom:14px;"></div>
-                            <button id="_eNextBtn" onclick="advanceAfterAnswer()" style="width:100%;padding:11px 0;border:none;border-radius:9px;font-size:0.95em;font-weight:700;cursor:pointer;background:rgba(0,0,0,0.12);color:inherit;letter-spacing:.3px;transition:background 0.2s;">Next Question →</button>
+                            <div id="_eExText" style="opacity:0.92;"></div>
                         </div>
                     </div>
-                </div>`;
+                </div>
+                <button id="_eNextBtn" onclick="advanceAfterAnswer()" style="display:none;width:100%;margin-top:20px;padding:16px 0;border:none;border-radius:12px;font-size:1.05em;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#667eea,#764ba2);color:white;letter-spacing:.4px;box-shadow:0 4px 15px rgba(102,126,234,0.4);transition:opacity 0.2s,transform 0.15s;">Continue →</button>`;
             _examContainer.appendChild(_examCardEl);
             _examQNumEl    = document.getElementById('_eqNum');
             _examScoreEl   = document.getElementById('_eScore');
@@ -2908,6 +2908,7 @@
             } else {
                 _examExplEl.style.display = 'none';
                 _examExplEl.className = '';
+                _examExNextEl.style.display = 'none';
             }
         }
 
@@ -2919,8 +2920,11 @@
             _examExLabelEl.textContent = isCorrect ? 'Correct!' : 'Incorrect';
             _examExTextEl.textContent = explanation;
             const isLast = currentIndex >= filteredQuestions.length - 1;
-            _examExNextEl.textContent = isLast ? 'Finish Exam →' : 'Next Question →';
+            _examExNextEl.textContent = isLast ? '🏁 Finish Exam' : 'Continue →';
             _examExNextEl.style.display = 'block';
+            _examExNextEl.style.background = isCorrect
+                ? 'linear-gradient(135deg,#11998e,#38b2ac)'
+                : 'linear-gradient(135deg,#667eea,#764ba2)';
         }
 
         function submitAnswer(selectedIdx, questionIndex) {
